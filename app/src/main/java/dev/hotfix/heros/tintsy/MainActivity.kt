@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -66,8 +67,8 @@ import dev.hotfix.heros.tintsy.ui.theme.LightGrey
 import dev.hotfix.heros.tintsy.ui.theme.TintsyTheme
 import dev.hotfix.heros.tintsy.ui.theme.getTopAppBarColors
 import dev.hotfix.heros.tintsy.util.PermissionChecker
+import dev.hotfix.heros.tintsy.view.AlbumViewModel
 import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -114,6 +115,7 @@ class MainActivity : ComponentActivity() {
             isGranted -> {
                 viewModel.onShouldShowPermissionRationale(false)
             }
+
             shouldShowRationale -> viewModel.onShouldShowPermissionRationale(true)
             else -> requestPermissionLauncher.launch(permissionString)
         }
@@ -127,7 +129,15 @@ class MainActivity : ComponentActivity() {
             startDestination = "home"
         ) {
             composable("home") {
-                MainScreen { navController.navigate("filter") }
+                MainScreen(
+                    onNext = { navController.navigate("filter") },
+                    onSettings = {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri = Uri.fromParts("package", packageName, null)
+                        intent.setData(uri)
+                        startActivity(intent)
+                    }
+                )
             }
             composable("filter") { backStackEntry ->
                 val uri by viewModel.headerImageUri.collectAsStateWithLifecycle()
@@ -170,7 +180,6 @@ class MainActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .height(300.dp)
                 .fillMaxWidth()
                 .background(BottomSheetBG)
         ) {
@@ -185,8 +194,8 @@ class MainActivity : ComponentActivity() {
                         Text("Filter name", style = TextStyle(fontSize = 14.sp))
                         Box(
                             modifier = Modifier
-                                .width(100.dp)
-                                .height(100.dp)
+                                .width(80.dp)
+                                .height(80.dp)
                                 .clip(RoundedCornerShape(8.dp)) // Apply rounded corners with a radius of 16.dp
                                 .background(Color.White)
                         )
@@ -195,7 +204,7 @@ class MainActivity : ComponentActivity() {
             }
             HorizontalDivider(color = LightGrey)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextButton(onCancel) { Text("Cancel") }
@@ -205,7 +214,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MainScreen(onNext: () -> Unit) {
+    fun MainScreen(onNext: () -> Unit, onSettings: () -> Unit) {
         val screenSate = viewModel.screenState.collectAsStateWithLifecycle()
         val shouldShowRationale by viewModel.shouldShowPermissionRationale.collectAsStateWithLifecycle()
 
@@ -218,14 +227,13 @@ class MainActivity : ComponentActivity() {
             if (!shouldShowRationale) {
                 ImageSelectionScreen(innerPadding, screenSate.value)
             } else {
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text("Tintsy requires read media permission to work")
-                    TextButton(onClick = {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        val uri = Uri.fromParts("package", packageName, null)
-                        intent.setData(uri)
-                        startActivity(intent)
-                    }) {
+                    TextButton(onClick = onSettings) {
                         Text("Settings")
                     }
                 }

@@ -1,4 +1,4 @@
-package dev.hotfix.heros.tintsy
+package dev.hotfix.heros.tintsy.view
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -31,7 +31,7 @@ class AlbumViewModel @Inject constructor(repository: LocalMediaRepository) : Vie
         }
     }.flowOn(Dispatchers.IO).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.Companion.WhileSubscribed(5_000),
         initialValue = ScreenState(isError = false, isLoading = true)
     )
 
