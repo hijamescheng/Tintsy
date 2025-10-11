@@ -1,0 +1,4 @@
+/Users/james/Library/Android/sdk/cmake/3.22.1/bin/ninja \
+  -C \
+  /Users/james/Projects/AndroidStudioProjects/Tintsy/opencv/.cxx/Debug/3w691tf2/arm64-v8a \
+  opencv_jni_shared

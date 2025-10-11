@@ -1,0 +1,47 @@
+[
+  {
+    "id": "original",
+    "name": "Original",
+    "isSelected": true
+  },
+  {
+    "id": "grey",
+    "name": "Grey scale",
+    "isSelected": false
+  },
+  {
+    "id": "blur",
+    "name": "Blur",
+    "isSelected": false
+  },
+  {
+    "id": "fade",
+    "name": "Fade",
+    "isSelected": false
+  },
+  {
+    "id": "fade_warm",
+    "name": "Fade warm",
+    "isSelected": false
+  },
+  {
+    "id": "fade_cool",
+    "name": "Fade cool",
+    "isSelected": false
+  },
+  {
+    "id": "simple",
+    "name": "Simple",
+    "isSelected": false
+  },
+  {
+    "id": "simple warm",
+    "name": "Simple warm",
+    "isSelected": false
+  },
+  {
+    "id": "simple_cool",
+    "name": "Simple Cool",
+    "isSelected": false
+  }
+]

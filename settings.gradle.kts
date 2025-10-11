@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Tintsy"
 include(":app")
+include(":opencv")

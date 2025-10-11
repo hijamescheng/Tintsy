@@ -18,12 +18,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -35,6 +43,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 }
 
@@ -53,6 +67,9 @@ dependencies {
     implementation(libs.coil.network)
     implementation(libs.compose.navigation)
     implementation(libs.compose.runtime)
+    implementation(libs.hilt.navigation)
+    implementation(libs.moshi)
+    implementation(project(":opencv"))
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)
