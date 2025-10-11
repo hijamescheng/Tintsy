@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import dev.hotfix.heros.tintsy.model.FilterSample
 import dev.hotfix.heros.tintsy.ui.theme.BottomSheetBG
 import dev.hotfix.heros.tintsy.ui.theme.LightGrey
 
@@ -47,12 +48,15 @@ fun FilterScreen(
     onDone: () -> Unit
 ) {
     val filterViewModel: FilterViewModel = hiltViewModel()
-    val filterList by filterViewModel.filterList.collectAsStateWithLifecycle()
+    val filterSamples by filterViewModel.filterSamples.collectAsStateWithLifecycle()
+    LaunchedEffect(uri) {
+        filterViewModel.loadFilterSamples(uri)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             FilterList(
-                list = filterList,
+                filterSamples = filterSamples,
                 onCancel = onCancel,
                 onDone = onDone,
                 onFilterClicked = { id ->
@@ -80,8 +84,8 @@ fun FilterScreen(
 
 @Composable
 fun FilterList(
-    list: List<FilterViewModel.ImageFilter>,
-    onFilterClicked: (id: String) -> Unit,
+    filterSamples: List<FilterSample>,
+    onFilterClicked: (id: Int) -> Unit,
     onCancel: () -> Unit,
     onDone: () -> Unit
 ) {
@@ -97,19 +101,27 @@ fun FilterList(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
-            items(items = list, key = { item -> item.id }) { item ->
+
+            items(items = filterSamples, key = { item -> item.filterInfo.id }) { item ->
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(item.name, style = TextStyle(fontSize = 14.sp), modifier = Modifier.padding(bottom = 8.dp))
-                    Box(
+                    Text(
+                        item.filterInfo.name,
+                        style = TextStyle(fontSize = 14.sp),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    AsyncImage(
+                        model = item.bitmap,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "filter sample image - ${item.filterInfo.name}",
                         modifier = Modifier
-                            .clickable { onFilterClicked(item.id) }
+                            .clickable { onFilterClicked(item.filterInfo.id) }
                             .width(80.dp)
                             .height(80.dp)
                             .then(
                                 if (item.isSelected) {
                                     Modifier
                                         .border(
-                                            border = BorderStroke(1.dp, Color.White),
+                                            border = BorderStroke(2.dp, Color.White),
                                             shape = RoundedCornerShape(8.dp)
                                         )
                                         .clip(
@@ -121,7 +133,6 @@ fun FilterList(
                                     )
                                 }
                             )
-                            .background(Color.Blue)
                     )
                 }
             }
