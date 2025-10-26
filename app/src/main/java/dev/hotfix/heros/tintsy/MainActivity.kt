@@ -120,7 +120,7 @@ class MainActivity : ComponentActivity() {
             }
             composable("filter") { backStackEntry ->
                 val uri by viewModel.headerImageUri.collectAsStateWithLifecycle()
-                FilterScreen(uri, { navController.navigate("home") }, {})
+                FilterScreen(uri, { navController.navigate("home") })
             }
         }
     }

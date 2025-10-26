@@ -44,13 +44,15 @@ import dev.hotfix.heros.tintsy.ui.theme.LightGrey
 @Composable
 fun FilterScreen(
     uri: Uri,
-    onCancel: () -> Unit,
-    onDone: () -> Unit
+    onCancel: () -> Unit
 ) {
     val filterViewModel: FilterViewModel = hiltViewModel()
     val filterSamples by filterViewModel.filterSamples.collectAsStateWithLifecycle()
+    val bitmap by filterViewModel.selectedImage.collectAsStateWithLifecycle()
+
     LaunchedEffect(uri) {
         filterViewModel.loadFilterSamples(uri)
+        filterViewModel.loadBitmapFromUri(uri)
     }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -58,7 +60,7 @@ fun FilterScreen(
             FilterList(
                 filterSamples = filterSamples,
                 onCancel = onCancel,
-                onDone = onDone,
+                onDone = { filterViewModel.saveBitmapToGallery() },
                 onFilterClicked = { id ->
                     filterViewModel.onSelectFilter(id)
                 }
@@ -73,7 +75,7 @@ fun FilterScreen(
             verticalArrangement = Arrangement.Center
         ) {
             AsyncImage(
-                model = uri,
+                model = bitmap,
                 contentScale = ContentScale.Fit,
                 contentDescription = "",
                 modifier = Modifier.fillMaxWidth()
