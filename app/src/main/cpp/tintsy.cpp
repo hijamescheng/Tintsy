@@ -24,7 +24,7 @@ using namespace cv;
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dev_hotfix_heros_tintsy_util_OpenCVUtil_applyGrayScaleFilter(
+Java_dev_lab_crashless_tintsy_util_OpenCVUtil_applyGrayScaleFilter(
         JNIEnv *env,
         jobject /* this */,
         jstring inputPath,
@@ -55,7 +55,7 @@ Java_dev_hotfix_heros_tintsy_util_OpenCVUtil_applyGrayScaleFilter(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dev_hotfix_heros_tintsy_util_OpenCVUtil_applyFilterNative(
+Java_dev_lab_crashless_tintsy_util_OpenCVUtil_applyFilterNative(
         JNIEnv* env,
         jobject /* this */,
         jobject bitmap,

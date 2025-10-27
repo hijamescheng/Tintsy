@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "94838868885",
+    "project_id": "tintsy-4236f",
+    "storage_bucket": "tintsy-4236f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94838868885:android:0700a27dedb66f4097849c",
+        "android_client_info": {
+          "package_name": "dev.lab.crashless.tintsy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4cqNWoBioB31nlxxLEpYzF8qNLd4XvIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

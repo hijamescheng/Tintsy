@@ -1,17 +1,21 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.service)
+    alias(libs.plugins.firebae.crashlytics)
 }
 
 android {
-    namespace = "dev.hotfix.heros.tintsy"
+    namespace = "dev.lab.crashless.tintsy"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.hotfix.heros.tintsy"
+        applicationId = "dev.lab.crashless.tintsy"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
@@ -32,6 +36,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        getByName("release") {
+            // Add this extension
+            configure<CrashlyticsExtension> {
+                // Enable processing and uploading of native symbols to Firebase servers.
+                // By default, this is disabled to improve build speeds.
+                // This flag must be enabled to see properly-symbolicated native
+                // stack traces in the Crashlytics dashboard.
+                nativeSymbolUploadEnabled = true
+            }
         }
     }
     compileOptions {
@@ -69,6 +83,9 @@ dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.hilt.navigation)
     implementation(libs.moshi)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
     implementation(project(":opencv"))
     ksp(libs.hilt.compiler)
 
