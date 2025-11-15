@@ -3,9 +3,13 @@
 
 🚧 More updates to come
 
-|||
-|---|---|
-|<img width="704" height="1487" alt="Screenshot_20251030_185820" src="https://github.com/user-attachments/assets/efda837a-f361-4887-b6aa-d5cdc3c13e0d" />|<img width="704" height="1487" alt="Screenshot_20251030_185828" src="https://github.com/user-attachments/assets/68f7cd42-1bf0-4a78-9dff-dd9d731e6bf9" />| 
+||||
+|---|---|---|
+|<img width="704" height="1487" alt="Screenshot_20251115_191713" src="https://github.com/user-attachments/assets/267d2f2e-3278-41db-8ca8-9be7bdd51447" />|<img width="704" height="1487" alt="Screenshot_20251115_191055" src="https://github.com/user-attachments/assets/95138689-d679-4048-8f77-adf0320e7c73" />|<img width="704" height="1487" alt="Screenshot_20251115_191706" src="https://github.com/user-attachments/assets/33603eff-ea1a-439d-84e3-1e191240ba77" />| 
+
+
+
+
 
 Apply filters to your photos with Tintsy.
 
