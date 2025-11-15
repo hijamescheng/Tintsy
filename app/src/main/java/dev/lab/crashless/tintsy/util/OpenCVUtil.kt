@@ -10,7 +10,5 @@ class OpenCVUtil @Inject constructor(){
     init {
         System.loadLibrary("tintsy") // your .so name
     }
-
-    external fun applyGrayScaleFilter(inputPath: String, outputPath: String)
     external fun applyFilterNative(bitmap: Bitmap, filterType: Int)
 }

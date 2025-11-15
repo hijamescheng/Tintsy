@@ -30,7 +30,14 @@ class FilterRepository @Inject constructor(
     }
 
     // apply a list of filter names
-    fun getFilters() = listOf(FilterInfo(0, "Gray"), FilterInfo(1, "Blur"))
+    fun getFilters() = listOf(
+        FilterInfo(0, "Gray"),
+        FilterInfo(1, "Blur"),
+        FilterInfo(3, "Vintage"),
+        FilterInfo(4, "Shadow"),
+        FilterInfo(5, "Grain"),
+        FilterInfo(6, "Film")
+    )
 
     fun decodeImage(uri: Uri, targetWidth: Int): Bitmap {
         val source = ImageDecoder.createSource(context.contentResolver, uri)

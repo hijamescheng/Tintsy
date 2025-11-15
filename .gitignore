@@ -1,6 +1,8 @@
 *.iml
 .gradle
 /local.properties
+/.idea/deploymentTargetSelector.xml
+/.idea/gradle.xml
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -12,5 +14,9 @@
 /captures
 .externalNativeBuild
 .cxx
+*.class
+.gitignore
+/app/release/*
+/opencv/build/*
 local.properties
 .idea/
