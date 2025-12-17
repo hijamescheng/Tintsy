@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.lifecycle.AndroidViewModel
@@ -21,6 +22,9 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.UUID
 import javax.inject.Inject
 
@@ -91,33 +95,45 @@ class FilterViewModel @Inject constructor(
         }
     }
 
-    fun saveBitmapToGallery() {
+    fun saveBitMapToGalleryCompact() {
         viewModelScope.launch(Dispatchers.IO) {
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, generateFileName())
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                put(
-                    MediaStore.MediaColumns.RELATIVE_PATH,
-                    Environment.DIRECTORY_PICTURES + dirctory
-                ) // custom folder
-                put(MediaStore.MediaColumns.IS_PENDING, 1)
-            }
+            val filename = generateFileName()
 
-            val resolver = appContext.contentResolver
-            val imageUri: Uri? =
-                resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-            val bitmapToSave = selectedImage.value
+            try {
+                var outputStream: OutputStream? = null
 
-            bitmapToSave?.let {
-                imageUri?.let { uri ->
-                    resolver.openOutputStream(uri)?.use { outputStream ->
-                        bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // Android 10+ → Scoped Storage
+                    val values = ContentValues().apply {
+                        put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+                        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+                        put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Tintsy")
                     }
-                    contentValues.clear()
-                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
-                    resolver.update(uri, contentValues, null, null)
+
+                    val uri = appContext.contentResolver.insert(MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
+                    uri?.let { outputStream = appContext.contentResolver.openOutputStream(uri) }
+
+                } else {
+                    // Android 8–9 → Legacy external storage
+                    val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    val tintsyDir = File(picturesDir, "Tintsy")
+                    if (!tintsyDir.exists()) tintsyDir.mkdirs()
+
+                    val file = File(tintsyDir, filename)
+                    outputStream = FileOutputStream(file)
+
+                    // Optional: notify MediaScanner about the new file
+                    appContext.sendBroadcast(android.content.Intent(android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, android.net.Uri.fromFile(file)))
+                }
+
+                outputStream?.use {
+                    selectedImage.value?.compress(Bitmap.CompressFormat.JPEG, 95, it)
                     _navigationEventFlow.emit(NavigationEvent.NavigateToSuccess)
                 }
+            } catch (e: Exception) {
+
             }
         }
     }

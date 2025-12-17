@@ -65,7 +65,7 @@ fun FilterScreen(
             FilterList(
                 filterSamples = filterSamples,
                 onCancel = onCancel,
-                onDone = { filterViewModel.saveBitmapToGallery() },
+                onDone = { filterViewModel.saveBitMapToGalleryCompact() },
                 onFilterClicked = { id ->
                     filterViewModel.onSelectFilter(id)
                 }

@@ -3,6 +3,7 @@ package dev.lab.crashless.tintsy
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -38,9 +39,10 @@ class MainActivity : ComponentActivity() {
 
     val requestPermissionLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { result: Map<String, Boolean> ->
+            val allGranted = result.values.all { it }
+            if (allGranted) {
                 lifecycleScope.launch {
                     repeatOnLifecycle(Lifecycle.State.STARTED) {
                         viewModel.onPermissionGranted()
@@ -72,18 +74,29 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestPhotoAlumPermission() {
-        val permissionString = Manifest.permission.READ_MEDIA_IMAGES
-        val isGranted = PermissionChecker.checkIfPermissionGranted(permissionString, this)
-        val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-            this, permissionString
-        )
-        when {
-            isGranted -> {
-                viewModel.onShouldShowPermissionRationale(false)
-            }
+        val permissions = getPermissionString()
+        val isGranted = permissions.all { permission ->
+            PermissionChecker.checkIfPermissionGranted(permission, this)
+        }
 
+        val shouldShowRationale = permissions.all { permission ->
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this, permission
+            )
+        }
+
+        when {
+            isGranted -> viewModel.onShouldShowPermissionRationale(false)
             shouldShowRationale -> viewModel.onShouldShowPermissionRationale(true)
-            else -> requestPermissionLauncher.launch(permissionString)
+            else -> requestPermissionLauncher.launch(getPermissionString())
+        }
+    }
+
+    private fun getPermissionString(): Array<String> {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else {
+            arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
         }
     }
 
