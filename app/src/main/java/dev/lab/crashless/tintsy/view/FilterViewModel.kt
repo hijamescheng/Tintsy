@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,16 +59,39 @@ class FilterViewModel @Inject constructor(
 
     fun loadBitmapFromUri(uri: Uri) {
         viewModelScope.launch {
-            val bitmap = try {
-                val source = ImageDecoder.createSource(appContext.contentResolver, uri)
-                ImageDecoder.decodeBitmap(source) { decoder, info, source ->
-                    decoder.isMutableRequired = true
-                }
-            } catch (e: Exception) {
-                null
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                decodeWithImageDecoder(uri)
+            } else {
+                decodeWithMediaStore(uri)
             }
             if (selectedBitmap == null) selectedBitmap = bitmap
             _selectedImage.emit(bitmap)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun decodeWithImageDecoder(uri: Uri): Bitmap? {
+        return try {
+            val source = ImageDecoder.createSource(appContext.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source) { decoder, info, source ->
+                decoder.isMutableRequired = true
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun decodeWithMediaStore(
+        uri: Uri
+    ): Bitmap? {
+        return try {
+            MediaStore.Images.Media.getBitmap(
+                appContext.contentResolver,
+                uri
+            )
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -109,15 +133,22 @@ class FilterViewModel @Inject constructor(
                         put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
                         put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
                         put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-                        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Tintsy")
+                        put(
+                            MediaStore.Images.Media.RELATIVE_PATH,
+                            Environment.DIRECTORY_PICTURES + "/Tintsy"
+                        )
                     }
 
-                    val uri = appContext.contentResolver.insert(MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
+                    val uri = appContext.contentResolver.insert(
+                        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                        values
+                    )
                     uri?.let { outputStream = appContext.contentResolver.openOutputStream(uri) }
 
                 } else {
                     // Android 8–9 → Legacy external storage
-                    val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    val picturesDir =
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                     val tintsyDir = File(picturesDir, "Tintsy")
                     if (!tintsyDir.exists()) tintsyDir.mkdirs()
 
@@ -125,7 +156,12 @@ class FilterViewModel @Inject constructor(
                     outputStream = FileOutputStream(file)
 
                     // Optional: notify MediaScanner about the new file
-                    appContext.sendBroadcast(android.content.Intent(android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, android.net.Uri.fromFile(file)))
+                    appContext.sendBroadcast(
+                        android.content.Intent(
+                            android.content.Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                            android.net.Uri.fromFile(file)
+                        )
+                    )
                 }
 
                 outputStream?.use {
