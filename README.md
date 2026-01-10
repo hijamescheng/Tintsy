@@ -10,6 +10,4 @@
 
 
 
-Apply filters to your photos with Tintsy.
-
-
+Apply filters to your photos with Tintsy now available on Play store https://play.google.com/store/apps/details?id=dev.lab.crashless.tintsy&hl=en
