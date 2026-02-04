@@ -1,5 +1,5 @@
 
-<img width="150" height="150" alt="Tintsy logo" src="https://github.com/user-attachments/assets/41d21aeb-4751-481b-8e2e-7eba302b4bbe" />
+# Tintsy <img width="100" height="100" alt="Tintsy logo" src="https://github.com/user-attachments/assets/41d21aeb-4751-481b-8e2e-7eba302b4bbe" />
 
 
 ||||
